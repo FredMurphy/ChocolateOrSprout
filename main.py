@@ -1,11 +1,15 @@
 #from guizero import App, Text, PushButton
 from player import Player
 from gamemode import GameMode
+from questions import Question
+
 from tkinter import *
 from tkinter import ttk
 from datetime import datetime
 from buildhat import Hat
 #import time
+
+question_count = 10
 
 hat = Hat()
 print(hat.get())
@@ -14,26 +18,39 @@ def set_question(question_text):
     instructionLabel.config(text = question_text)
     
 def doPolling():
-    global game_mode, red_player_ready, blue_player_ready
-    if (game_mode == GameMode.WaitingToStart):
+    global game_mode, red_player_ready, blue_player_ready, questions, question_number
+    if game_mode == GameMode.WaitingToStart:
+        #print('WaitingToStart...')
         if red_player_ready == False:
             red_player_ready = (red_player.get_color() != "")
             if red_player_ready:
-                set_question("Red player ready!")
+                set_question("Red player ready! Waiting for Blue...")
                 
         if blue_player_ready == False:
             blue_player_ready = (blue_player.get_color() != "")
             if blue_player_ready:
-                set_question("Blue player ready!")
+                set_question("Blue player ready! Waiting for Red...")
             
         if (red_player_ready and blue_player_ready):
             game_mode = GameMode.Playing
+            question_number = 0
             instructionLabel.config(text = "Let's play!")
-    
+
+    elif game_mode == GameMode.Playing:
+        #print('Playing...')
+        set_question(questions[question_number].text)
+        question_number = question_number + 1
+        if question_number >= len(questions):
+           question_number = 0 
+        
     frame.after(1000, doPolling)
             
 global game_mode
 game_mode = GameMode.WaitingToStart
+
+question_number = 0
+questions = Question.get_random(question_count)
+print("First question:", questions[0].text)
 #print(game_mode)
 
 red_player = Player('D', 'A', 1)
@@ -57,7 +74,7 @@ style.configure("TFrame", background="#21138a")
 style.configure("Question.TLabel", font="Tahoma 20", background="#21138a", foreground="#ffffff")
 
 frame = ttk.Frame(root, borderwidth=2, padding=10)
-instructionLabel = ttk.Label(frame, text="Hold any card over the left hand scanner to get started", style="Question.TLabel")
+instructionLabel = ttk.Label(frame, text="When each player is ready, hold any card over the card reader on your side.", style="Question.TLabel")
 instructionLabel.grid(column=0, row=0, columnspan=2)
 label1 = ttk.Label(frame, text="1").grid(column=0, row=1)
 label3 = ttk.Label(frame, text="3").grid(column=1, row=1)
