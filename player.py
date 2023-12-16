@@ -6,7 +6,18 @@ class Player:
         self.sensor = ColorDistanceSensor(sensor_port)
         self.motor = Motor(motor_port)
         self.chocolate_direction = chocolate_direction
+        self.score = 0
         
+    def zero(self):
+        self.score = 0
+    
+    def add_point(self):
+        self.score = self.score + 1
+        print('Score now', self.score)
+    
+    def get_score(self):
+        return self.score
+    
     def get_color(self):
         distance = self.sensor.get_distance()
         if (distance > 1):

@@ -5,20 +5,45 @@ from questions import Question
 
 from tkinter import *
 from tkinter import ttk
-from datetime import datetime
 from buildhat import Hat
 #import time
 
+poll_time = 1000
+timer_reset = 10
+
 question_count = 10
+timer = timer_reset
 
 hat = Hat()
-print(hat.get())
+hat_ready = False
+while hat_ready == False:
+    print("Waiting for BuildHat...")
+    hat_ready = hat.get()['A']['connected']
 
 def set_question(question_text):
     instructionLabel.config(text = question_text)
+
+def show_timer():
+    global timer, timer_label
+    timer_label.config(text = str(timer) + "...")
     
-def doPolling():
-    global game_mode, red_player_ready, blue_player_ready, questions, question_number
+def show_score():
+    global red_score, blue_score, red_player, blue_player
+    red_score.config(text = red_player.score)
+    blue_score.config(text = blue_player.score)
+    
+def start_game():
+    global game_mode, question_number, red_player, blue_player, timer
+    game_mode = GameMode.Playing
+    question_number = -1
+    timer = timer_reset
+    instructionLabel.config(text = "Let's play!")
+    red_player.zero()
+    blue_player.zero()
+    show_score()
+
+def tick():
+    global game_mode, red_player, red_player_ready, blue_player, blue_player_ready, questions, question_number, timer, timer_reset
     if game_mode == GameMode.WaitingToStart:
         #print('WaitingToStart...')
         if red_player_ready == False:
@@ -32,25 +57,34 @@ def doPolling():
                 set_question("Blue player ready! Waiting for Red...")
             
         if (red_player_ready and blue_player_ready):
-            game_mode = GameMode.Playing
-            question_number = 0
-            instructionLabel.config(text = "Let's play!")
+            start_game()
 
     elif game_mode == GameMode.Playing:
         #print('Playing...')
-        set_question(questions[question_number].text)
-        question_number = question_number + 1
-        if question_number >= len(questions):
-           question_number = 0 
+        # check answers
+        timer = timer - 1
+        show_timer()
         
-    frame.after(1000, doPolling)
+        if timer <= 0:
+            show_score()
+            question_number = question_number + 1
+            timer = timer_reset
+            set_question(questions[question_number].text)
+            # todo: work out who to give point to
+            red_player.add_point()
+            show_score()
+            if question_number >= len(questions):
+                # todo: finish game
+               start_game() 
+        
+    frame.after(poll_time, tick)
             
 global game_mode
 game_mode = GameMode.WaitingToStart
 
 question_number = 0
 questions = Question.get_random(question_count)
-print("First question:", questions[0].text)
+#print("First question:", questions[0].text)
 #print(game_mode)
 
 red_player = Player('D', 'A', 1)
@@ -76,12 +110,26 @@ style.configure("Question.TLabel", font="Tahoma 20", background="#21138a", foreg
 frame = ttk.Frame(root, borderwidth=2, padding=10)
 instructionLabel = ttk.Label(frame, text="When each player is ready, hold any card over the card reader on your side.", style="Question.TLabel")
 instructionLabel.grid(column=0, row=0, columnspan=2)
-label1 = ttk.Label(frame, text="1").grid(column=0, row=1)
-label3 = ttk.Label(frame, text="3").grid(column=1, row=1)
 
+ttk.Label(frame, text="Red").grid(column=0, row=1)
+ttk.Label(frame, text="Blue").grid(column=1, row=1)
+
+red_answer = ttk.Label(frame, text="?")
+red_answer.grid(column=0, row=2)
+blue_answer = ttk.Label(frame, text="?")
+blue_answer.grid(column=1, row=2)
+
+red_score = ttk.Label(frame, text="-")
+red_score.grid(column=0, row=3)
+blue_score = ttk.Label(frame, text="-")
+blue_score.grid(column=1, row=3)
+
+timer_label = ttk.Label(frame, text = "-")
+timer_label.grid(column=0, row=4, columnspan=2)
 
 frame.place(x=1900, y=400, width=1200, height=300, anchor="ne")
-frame.after(1000, doPolling)
+frame.grid_propagate(0)
+frame.after(poll_time, tick)
 root.mainloop()
 
 
