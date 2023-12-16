@@ -5,7 +5,10 @@ class Question:
     def __init__(self, text, answer_color):
         self.text = text
         self.answer_color = answer_color
-
+    
+    def is_correct(self, color):
+        return color == self.answer_color
+    
     def get_random(count):
         if count > len(questions):
             count = len(questions)

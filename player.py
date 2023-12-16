@@ -13,7 +13,7 @@ class Player:
     
     def add_point(self):
         self.score = self.score + 1
-        print('Score now', self.score)
+        #print('Score now', self.score)
     
     def get_score(self):
         return self.score
