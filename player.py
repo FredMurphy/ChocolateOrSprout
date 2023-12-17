@@ -1,4 +1,5 @@
 from buildhat import Motor, ColorDistanceSensor
+import time
 
 class Player:
     
@@ -7,6 +8,7 @@ class Player:
         self.motor = Motor(motor_port)
         self.chocolate_direction = chocolate_direction
         self.score = 0
+        self.motor.set_default_speed(7)
         
     def zero(self):
         self.score = 0
@@ -17,6 +19,16 @@ class Player:
     
     def get_score(self):
         return self.score
+    
+    def drop_chocolate(self):
+        self.motor.run_for_degrees(60 * self.chocolate_direction)
+        #time.sleep(1)
+        self.motor.run_for_degrees(-60 * self.chocolate_direction)
+    
+    def drop_sprout(self):
+        self.motor.run_for_degrees(-60 * self.chocolate_direction)
+        #time.sleep(1)
+        self.motor.run_for_degrees(60 * self.chocolate_direction)
     
     def get_color(self):
         distance = self.sensor.get_distance()
