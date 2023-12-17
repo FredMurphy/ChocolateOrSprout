@@ -16,10 +16,10 @@ class Question:
         return questions[:count]
         
 questions = [
-    Question('01. The answer is red', 'red'),
-    Question('02. The answer is green', 'green'),
-    Question('03. The answer is blue', 'blue'),
-    Question('04. The answer is yellow', 'yellow'),
+    Question('In the film Home Alone, where were the family going for Christmas?', 'green'),
+    Question('What language is the Christams song Feliz Navidad?', 'red'),
+    Question('What country has panetone as their Christmas cake?', 'blue'),
+    Question('What country has STOLLEN as their Christmas cake?', 'yellow'),
     Question('05. The answer is red', 'red'),
     Question('06. The answer is green', 'green'),
     Question('07. The answer is blue', 'blue'),

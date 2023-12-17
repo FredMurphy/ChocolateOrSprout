@@ -13,7 +13,7 @@ import random
 poll_time = 100
 timer_reset = 100
 
-question_count = 3
+question_count = 10
 timer = timer_reset
 
 hat = Hat()
@@ -38,16 +38,22 @@ def show_timer():
 def show_both_thinking():
     global red_answer_label, blue_answer_label, image_thinking
     
-    red_answer_label.configure(image = image_thinking[random.randint(0,3)])
-    blue_answer_label.configure(image = image_thinking[random.randint(0,3)])
+    red_answer_label.configure(image = image_thinking)
+    blue_answer_label.configure(image = image_thinking)
+
+def show_both_santa():
+    global red_answer_label, blue_answer_label, image_thinking
+    
+    red_answer_label.configure(image = image_santa)
+    blue_answer_label.configure(image = image_santa)
 
 def show_red_answered():
     global red_answer_label, image_answered
-    red_answer_label.configure(image = image_answered[random.randint(0,5)])
+    red_answer_label.configure(image = image_answered)
 
 def show_blue_answered():
     global blue_answer_label, image_answered
-    blue_answer_label.configure(image = image_answered[random.randint(0,5)])
+    blue_answer_label.configure(image = image_answered)
     
 def waiting_to_start():
     global game_mode, timer, red_player_ready, blue_player_ready, red_answer, blue_answer
@@ -86,6 +92,7 @@ def finish_game():
     global game_mode, timer
     game_mode = GameMode.Finished
     timer = timer_reset
+    show_both_santa()
     set_question('The game has finished! Here are your prizes...')
     if blue_player.score > red_player.score:
         #blue wins
@@ -206,7 +213,7 @@ style.configure("Question.TLabel", font="Tahoma 20", background="#21138a", foreg
 style.configure("Answer.TLabel", font="Tahoma 16", background="#21138a", foreground="#ffffff")
 
 frame = ttk.Frame(root, borderwidth=0, padding=0)
-frame.rowconfigure(0, minsize=100)
+frame.rowconfigure(0, minsize=150)
 frame.columnconfigure(0, minsize=600)
 frame.columnconfigure(1, minsize=600)
 instructionLabel = ttk.Label(frame, text="Loading...", style="Question.TLabel")
@@ -215,24 +222,13 @@ instructionLabel.grid(column=0, row=0, columnspan=2)
 ttk.Label(frame, text="Red player", style="Answer.TLabel").grid(column=0, row=1)
 ttk.Label(frame, text="Blue player", style="Answer.TLabel").grid(column=1, row=1)
 
-image_thinking = [
-    ImageTk.PhotoImage(Image.open("thinking_1.png")),
-    ImageTk.PhotoImage(Image.open("thinking_2.png")),
-    ImageTk.PhotoImage(Image.open("thinking_3.png")),
-    ImageTk.PhotoImage(Image.open("thinking_4.png"))
-    ]
-image_answered = [
-    ImageTk.PhotoImage(Image.open("answered_1.png")),
-    ImageTk.PhotoImage(Image.open("answered_2.png")),
-    ImageTk.PhotoImage(Image.open("answered_3.png")),
-    ImageTk.PhotoImage(Image.open("answered_4.png")),
-    ImageTk.PhotoImage(Image.open("answered_5.png")),
-    ImageTk.PhotoImage(Image.open("answered_6.png"))
-    ]
+image_thinking = ImageTk.PhotoImage(Image.open("thinking_2.png"))
+image_answered = ImageTk.PhotoImage(Image.open("answered_2.png"))
+image_santa = ImageTk.PhotoImage(Image.open("santa.png"))
 
-red_answer_label = ttk.Label(frame, image = image_thinking[0], style="Answer.TLabel")
+red_answer_label = ttk.Label(frame, image = image_thinking, style="Answer.TLabel")
 red_answer_label.grid(column=0, row=2)
-blue_answer_label = ttk.Label(frame, image = image_thinking[0], style="Answer.TLabel")
+blue_answer_label = ttk.Label(frame, image = image_thinking, style="Answer.TLabel")
 blue_answer_label.grid(column=1, row=2)
 
 #red_score = ttk.Label(frame, text="-")
