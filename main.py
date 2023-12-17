@@ -6,8 +6,8 @@ from questions import Question
 from tkinter import *
 from tkinter import ttk
 from buildhat import Hat
-#from PIL import ImageTk
-
+from PIL import Image, ImageTk
+import random
 #import time
 
 poll_time = 100
@@ -30,16 +30,32 @@ def show_timer():
     timer_percent = timer * 100 / timer_reset
     progress['value'] = timer_percent
     
-def show_score():
-    global red_score, blue_score, red_player, blue_player
-    red_score.config(text = red_player.score)
-    blue_score.config(text = blue_player.score)
+#def show_score():
+#    global red_score, blue_score, red_player, blue_player
+#    red_score.config(text = red_player.score)
+#    blue_score.config(text = blue_player.score)
+
+def show_both_thinking():
+    global red_answer_label, blue_answer_label, image_thinking
+    
+    red_answer_label.configure(image = image_thinking[random.randint(0,3)])
+    blue_answer_label.configure(image = image_thinking[random.randint(0,3)])
+
+def show_red_answered():
+    global red_answer_label, image_answered
+    red_answer_label.configure(image = image_answered[random.randint(0,5)])
+
+def show_blue_answered():
+    global blue_answer_label, image_answered
+    blue_answer_label.configure(image = image_answered[random.randint(0,5)])
     
 def waiting_to_start():
     global game_mode, timer, red_player_ready, blue_player_ready, red_answer, blue_answer
     game_mode = GameMode.WaitingToStart
     set_question("OK. Load up your prizes. Chocolate at the front, sprout at the back.\nWhen each player is ready, hold any card over the card reader on your side.")
+    show_both_thinking()
     timer = timer_reset
+    show_both_thinking()
     red_player_ready = False
     blue_player_ready = False
     red_answer = ""
@@ -50,6 +66,7 @@ def about_to_play():
     game_mode = GameMode.AboutToPlay
     set_question("Let's play! First question coming up...")
     timer = timer_reset
+    show_both_thinking()
     red_answer = ""
     blue_answer = ""
     
@@ -61,6 +78,7 @@ def start_game():
     set_question(questions[question_number].text)
     red_player.zero()
     blue_player.zero()
+    show_both_thinking()
     show_timer()
     #show_score()
 
@@ -86,12 +104,16 @@ def check_answers():
     global red_answer, blue_answer
     if red_answer == "":
         red_answer = red_player.get_color()
-        
+        if (red_answer != ""):
+            show_red_answered()
+            
     if blue_answer == "":
         blue_answer = blue_player.get_color()
+        if (blue_answer != ""):
+            show_blue_answered()
     # to do - change image
-    red_answer_label.config(text = red_answer)
-    blue_answer_label.config(text = blue_answer)
+    #red_answer_label.config(text = red_answer)
+    #blue_answer_label.config(text = blue_answer)
 
 def next_question():
     global questions, question_number, timer, timer_reset, red_answer, blue_answer
@@ -102,6 +124,7 @@ def next_question():
 
     timer = timer_reset
     set_question(questions[question_number].text)
+    show_both_thinking()
     red_answer = ""
     blue_answer = ""
 
@@ -113,11 +136,13 @@ def tick():
         if red_player_ready == False:
             red_player_ready = (red_player.get_color() != "")
             if red_player_ready:
+                show_red_answered()
                 set_question("Red player ready! Waiting for Blue...")
                 
         if blue_player_ready == False:
             blue_player_ready = (blue_player.get_color() != "")
             if blue_player_ready:
+                show_blue_answered()
                 set_question("Blue player ready! Waiting for Red...")
             
         if red_player_ready and blue_player_ready:
@@ -141,11 +166,11 @@ def tick():
                 red_player.add_point()
             if questions[question_number].is_correct(blue_answer):
                 blue_player.add_point()
-            show_score()
+            #show_score()
             next_question()
     
     elif game_mode == GameMode.Finished:
-        print('Finished...', timer)
+        #print('Finished...', timer)
         timer = timer - 1
         if timer <= 0:
             waiting_to_start()
@@ -178,29 +203,42 @@ canvas.create_text(600, 120, anchor="nw", text="This is a game where you battle 
 style = ttk.Style()
 style.configure("TFrame", background="#21138a")
 style.configure("Question.TLabel", font="Tahoma 20", background="#21138a", foreground="#ffffff")
+style.configure("Answer.TLabel", font="Tahoma 16", background="#21138a", foreground="#ffffff")
 
-frame = ttk.Frame(root, borderwidth=2, padding=10)
+frame = ttk.Frame(root, borderwidth=0, padding=0)
+frame.rowconfigure(0, minsize=100)
+frame.columnconfigure(0, minsize=600)
+frame.columnconfigure(1, minsize=600)
 instructionLabel = ttk.Label(frame, text="Loading...", style="Question.TLabel")
 instructionLabel.grid(column=0, row=0, columnspan=2)
 
-ttk.Label(frame, text="Red").grid(column=0, row=1)
-ttk.Label(frame, text="Blue").grid(column=1, row=1)
+ttk.Label(frame, text="Red player", style="Answer.TLabel").grid(column=0, row=1)
+ttk.Label(frame, text="Blue player", style="Answer.TLabel").grid(column=1, row=1)
 
-#image_thinking = ImageTk.PhotoImage(Image.open("thinking_1.png"))
-#image_answered = ImageTk.PhotoImage(Image.open("answered_1.png"))
+image_thinking = [
+    ImageTk.PhotoImage(Image.open("thinking_1.png")),
+    ImageTk.PhotoImage(Image.open("thinking_2.png")),
+    ImageTk.PhotoImage(Image.open("thinking_3.png")),
+    ImageTk.PhotoImage(Image.open("thinking_4.png"))
+    ]
+image_answered = [
+    ImageTk.PhotoImage(Image.open("answered_1.png")),
+    ImageTk.PhotoImage(Image.open("answered_2.png")),
+    ImageTk.PhotoImage(Image.open("answered_3.png")),
+    ImageTk.PhotoImage(Image.open("answered_4.png")),
+    ImageTk.PhotoImage(Image.open("answered_5.png")),
+    ImageTk.PhotoImage(Image.open("answered_6.png"))
+    ]
 
-red_answer_label = ttk.Label(frame, text = "")
+red_answer_label = ttk.Label(frame, image = image_thinking[0], style="Answer.TLabel")
 red_answer_label.grid(column=0, row=2)
-blue_answer_label = ttk.Label(frame, text = "")
+blue_answer_label = ttk.Label(frame, image = image_thinking[0], style="Answer.TLabel")
 blue_answer_label.grid(column=1, row=2)
 
-red_score = ttk.Label(frame, text="-")
-red_score.grid(column=0, row=3)
-blue_score = ttk.Label(frame, text="-")
-blue_score.grid(column=1, row=3)
-
-#timer_label = ttk.Label(frame, text = "-")
-#timer_label.grid(column=0, row=4, columnspan=2)
+#red_score = ttk.Label(frame, text="-")
+#red_score.grid(column=0, row=3)
+#blue_score = ttk.Label(frame, text="-")
+#blue_score.grid(column=1, row=3)
 
 frame.place(x=1900, y=400, width=1200, height=300, anchor="ne")
 
