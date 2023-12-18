@@ -1,4 +1,3 @@
-#from guizero import App, Text, PushButton
 from player import Player
 from gamemode import GameMode
 from questions import Question
@@ -7,8 +6,6 @@ from tkinter import *
 from tkinter import ttk
 from buildhat import Hat
 from PIL import Image, ImageTk
-import random
-#import time
 
 poll_time = 100
 timer_reset = 100
@@ -29,21 +26,17 @@ def show_timer():
     global timer
     timer_percent = timer * 100 / timer_reset
     progress['value'] = timer_percent
-    
-#def show_score():
-#    global red_score, blue_score, red_player, blue_player
-#    red_score.config(text = red_player.score)
-#    blue_score.config(text = blue_player.score)
+
 
 def show_both_thinking():
     global red_answer_label, blue_answer_label, image_thinking
-    
+
     red_answer_label.configure(image = image_thinking)
     blue_answer_label.configure(image = image_thinking)
 
 def show_both_santa():
     global red_answer_label, blue_answer_label, image_thinking
-    
+
     red_answer_label.configure(image = image_santa)
     blue_answer_label.configure(image = image_santa)
 
@@ -54,11 +47,11 @@ def show_red_answered():
 def show_blue_answered():
     global blue_answer_label, image_answered
     blue_answer_label.configure(image = image_answered)
-    
+
 def waiting_to_start():
     global game_mode, timer, red_player_ready, blue_player_ready, red_answer, blue_answer
     game_mode = GameMode.WaitingToStart
-    set_question("OK. Load up your prizes. Chocolate at the front, sprout at the back.\nWhen each player is ready, hold any card over the card reader on your side.")
+    set_question("OK. Load up your prizes. Chocolate at the front, sprout (or mini Bounty) at the back.\nWhen each player is ready, hold any card over the card reader on your side.")
     show_both_thinking()
     timer = timer_reset
     show_both_thinking()
@@ -75,7 +68,7 @@ def about_to_play():
     show_both_thinking()
     red_answer = ""
     blue_answer = ""
-    
+
 def start_game():
     global game_mode, question_number, red_player, blue_player, timer
     game_mode = GameMode.Playing
@@ -106,18 +99,22 @@ def finish_game():
         # it's a tie
         blue_player.drop_chocolate()
         red_player.drop_chocolate()
-        
+
 def check_answers():
-    global red_answer, blue_answer
+    global red_answer, blue_answer, timer
     if red_answer == "":
         red_answer = red_player.get_color()
         if (red_answer != ""):
             show_red_answered()
-            
+
     if blue_answer == "":
         blue_answer = blue_player.get_color()
         if (blue_answer != ""):
             show_blue_answered()
+
+    # Both answered, so speed things along
+    if (blue_answer != "" and red_answer != ""):
+        timer = timer - 2
     # to do - change image
     #red_answer_label.config(text = red_answer)
     #blue_answer_label.config(text = blue_answer)
@@ -145,29 +142,29 @@ def tick():
             if red_player_ready:
                 show_red_answered()
                 set_question("Red player ready! Waiting for Blue...")
-                
+
         if blue_player_ready == False:
             blue_player_ready = (blue_player.get_color() != "")
             if blue_player_ready:
                 show_blue_answered()
                 set_question("Blue player ready! Waiting for Red...")
-            
+
         if red_player_ready and blue_player_ready:
             about_to_play()
-            
+
     elif game_mode == GameMode.AboutToPlay:
         #print('Time to play...')
         timer = timer - 1
         show_timer()
         if timer <= 0:
             start_game()
-        
+
     elif game_mode == GameMode.Playing:
         #print('Playing...')
         check_answers()
         timer = timer - 1
         show_timer()
-        
+
         if timer <= 0:
             if questions[question_number].is_correct(red_answer):
                 red_player.add_point()
@@ -175,13 +172,13 @@ def tick():
                 blue_player.add_point()
             #show_score()
             next_question()
-    
+
     elif game_mode == GameMode.Finished:
         #print('Finished...', timer)
         timer = timer - 1
         if timer <= 0:
             waiting_to_start()
-            
+
     frame.after(poll_time, tick)
 
 global game_mode
@@ -198,6 +195,7 @@ blue_answer = ""
 
 root = Tk()
 root.title("Chocolate or Sprouts")
+root.overrideredirect(True)
 root.geometry("1920x1080")
 
 backgroundImage =  PhotoImage(file="background1920x1080.png")
@@ -231,20 +229,12 @@ red_answer_label.grid(column=0, row=2)
 blue_answer_label = ttk.Label(frame, image = image_thinking, style="Answer.TLabel")
 blue_answer_label.grid(column=1, row=2)
 
-#red_score = ttk.Label(frame, text="-")
-#red_score.grid(column=0, row=3)
-#blue_score = ttk.Label(frame, text="-")
-#blue_score.grid(column=1, row=3)
-
 frame.place(x=1900, y=400, width=1200, height=300, anchor="ne")
 
 progress = ttk.Progressbar(length=1200)
 progress.place(x=1900, y=700, width=1200, height=100, anchor="ne")
 progress['value'] = 100
 
-
 waiting_to_start()
 frame.after(poll_time, tick)
 root.mainloop()
-
-
