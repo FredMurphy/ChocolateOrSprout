@@ -1,3 +1,7 @@
+# Please don't judge this Python code!
+# It's very procedural as I was trying to teach a 10 year old Python and he was having a bit of trouble with classes
+# The Player class is a basic example of what a class is for
+
 from player import Player
 from gamemode import GameMode
 from questions import Question
@@ -6,6 +10,7 @@ from tkinter import *
 from tkinter import ttk
 from buildhat import Hat
 from PIL import Image, ImageTk
+import time
 
 poll_time = 100
 timer_reset = 100
@@ -106,21 +111,22 @@ def check_answers():
         red_answer = red_player.get_color()
         if (red_answer != ""):
             show_red_answered()
-
+        
     if blue_answer == "":
         blue_answer = blue_player.get_color()
         if (blue_answer != ""):
             show_blue_answered()
 
-    # Both answered, so speed things along
-    if (blue_answer != "" and red_answer != ""):
-        timer = timer - 2
+    # Someone has answered, so speed things along
+    if (blue_answer != "" or red_answer != "") and timer > 5:
+        timer = 5
     # to do - change image
     #red_answer_label.config(text = red_answer)
     #blue_answer_label.config(text = blue_answer)
 
 def next_question():
     global questions, question_number, timer, timer_reset, red_answer, blue_answer
+      
     question_number = question_number + 1
     if question_number >= len(questions):
         finish_game()
@@ -166,10 +172,15 @@ def tick():
         show_timer()
 
         if timer <= 0:
+            # Ensure we don't have a card in place to incorrectly answer the next question
+            while (blue_player.get_color() != "" or red_player.get_color() != ""):
+                time.sleep(0.1)
+
             if questions[question_number].is_correct(red_answer):
                 red_player.add_point()
             if questions[question_number].is_correct(blue_answer):
                 blue_player.add_point()
+            
             #show_score()
             next_question()
 

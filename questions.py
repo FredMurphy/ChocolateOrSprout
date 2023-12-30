@@ -22,10 +22,10 @@ questions = [
     Question("What country has panetone as their Christmas cake?", "blue"), # Italy
     Question("What country has stollen as their Christmas cake?", "yellow"), # Germany
     # People
-    Question("Who has their birthday the furthest away from Christmas?", "red"), # Rich
-    Question("Who has cooked the most (and probably the best) Christmas dinners?", "green"), # Pip
-    Question("Who was supposed to be born on Christmas Eve (but wasn't)?", "blue"), # Daniel
-    Question("Who once spent Christmas in hospital?", "yellow"), # Adam
+    #Question("Who has their birthday the furthest away from Christmas?", "red"), # Rich
+    #Question("Who has cooked the most (and probably the best) Christmas dinners?", "green"), # Pip
+    #Question("Who was supposed to be born on Christmas Eve (but wasn't)?", "blue"), # Daniel
+    #Question("Who once spent Christmas in hospital?", "yellow"), # Adam
     # Colours
     Question("What colour is Rudolph's nose?", "red"),
     Question("What colour was Sant's coat before Coca-Cola changed it to red?", "green"),
